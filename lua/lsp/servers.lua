@@ -1,3 +1,4 @@
+-- Mason setup
 require("mason").setup()
 require("mason-lspconfig").setup({
     ensure_installed = { "lua_ls", "vuels", "jdtls" },
@@ -5,34 +6,36 @@ require("mason-lspconfig").setup({
 })
 
 local lspconfig = require("lspconfig")
+
+-- Lua Language Server
 lspconfig.lua_ls.setup({})
+
+-- Vue Language Server
 lspconfig.vuels.setup({})
 
--- java
-
+-- Java Language Server
 lspconfig.jdtls.setup({
     cmd = {
         "jdtls",
         "-configuration", vim.fn.expand("~/.cache/jdtls/config"),
         "-data", vim.fn.expand("~/.cache/jdtls/workspace/" .. vim.fn.fnamemodify(vim.fn.getcwd(), ":p:h:t")),
-        -- 添加本地Maven仓库配置
         "-Dmaven.repo.local=" .. vim.fn.expand("~/.m2/repository"),
         "-Djava.configuration.maven.userSettings=" .. vim.fn.expand("~/.m2/settings.xml"),
     },
     root_dir = lspconfig.util.root_pattern("pom.xml", "gradle.build", ".git"),
     settings = {
         java = {
-            home = vim.fn.expand("$JAVA_HOME"), -- 使用本地JDK
+            home = vim.fn.expand("$JAVA_HOME"),
             configuration = {
                 updateBuildConfiguration = "interactive"
             },
             maven = {
-                downloadSources = true,                            -- 改为false，避免自动下载
-                downloadJavadoc = true,                            -- 改为false
-                userSettings = vim.fn.expand("~/.m2/settings.xml") -- 使用本地Maven设置
+                downloadSources = true,
+                downloadJavadoc = true,
+                userSettings = vim.fn.expand("~/.m2/settings.xml")
             },
             eclipse = {
-                downloadSources = true, -- 改为false
+                downloadSources = true,
                 downloadJavadoc = true
             },
             implementationsCodeLens = {
@@ -42,7 +45,7 @@ lspconfig.jdtls.setup({
                 enabled = true
             },
             references = {
-                includeDecompiledSources = true -- 保留，用于反编译查看
+                includeDecompiledSources = true
             },
             format = {
                 enabled = true

@@ -1,4 +1,5 @@
 require("config.lazy")
-require("remap")
-require("mylsp")
--- require("lsp")
+require("config.init")
+require("config.keymaps")
+require("config.autocmds")
+require("lsp")
