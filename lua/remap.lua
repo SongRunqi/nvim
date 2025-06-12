@@ -9,6 +9,15 @@ vim.opt.expandtab = true   -- 将 tab 转换为空格
 vim.opt.autoindent = true  -- 自动缩进
 vim.opt.smartindent = true -- 智能缩进
 
+
+-- sync clipboard with os and neovim
+vim.schedule(function()
+    vim.o.clipboard = 'unnamedplus'
+end)
+
+-- Enable break indent
+vim.o.breakindent = true
+
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 -- Diagnostic keymaps
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })

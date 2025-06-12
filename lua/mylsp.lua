@@ -4,7 +4,6 @@ require("mason-lspconfig").setup({
     automatic_enable = true,
 })
 
-print("hello lspconfig")
 local lspconfig = require("lspconfig")
 lspconfig.lua_ls.setup({})
 lspconfig.vuels.setup({})
@@ -28,13 +27,13 @@ lspconfig.jdtls.setup({
                 updateBuildConfiguration = "interactive"
             },
             maven = {
-                downloadSources = false,                           -- 改为false，避免自动下载
-                downloadJavadoc = false,                           -- 改为false
+                downloadSources = true,                            -- 改为false，避免自动下载
+                downloadJavadoc = true,                            -- 改为false
                 userSettings = vim.fn.expand("~/.m2/settings.xml") -- 使用本地Maven设置
             },
             eclipse = {
-                downloadSources = false, -- 改为false
-                downloadJavadoc = false
+                downloadSources = true, -- 改为false
+                downloadJavadoc = true
             },
             implementationsCodeLens = {
                 enabled = true
