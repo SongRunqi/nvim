@@ -19,4 +19,3 @@ vim.o.breakindent = true
 vim.g.have_nerd_font = true
 
 -- Theme
-vim.cmd [[colorscheme tokyonight-night]]

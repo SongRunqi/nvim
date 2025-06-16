@@ -17,6 +17,14 @@
 -- <leader>q      - Diagnostics: Open quickfix list
 -- <leader>tl     - Todo: Show all TODO comments in location list
 -- <leader>tt     - Terminal: Toggle floating terminal
+-- <leader>tv     - Terminal: Toggle vertical terminal
+-- <leader>th     - Terminal: Toggle horizontal terminal
+-- <leader>t1-4   - Terminal: Toggle specific terminal instances
+-- <leader>tT     - Terminal: Toggle tab terminal
+-- <leader>ts     - Terminal: Send command to terminal
+-- <leader>pt     - Telescope: Terminal manager
+-- <leader>tr     - Terminal: Run current file (code runner)
+-- <leader>tn     - Terminal: Create new terminal
 -- <leader>u      - Undotree: Toggle undo history
 -- ============================================================================
 
@@ -84,93 +92,20 @@ end, { desc = "DAP UI eval expression" })
 -- NvimTree toggle - show/hide file explorer sidebar
 vim.keymap.set("n", "<leader>e", "<cmd>NvimTreeToggle<cr>", { desc = "Toggle NvimTree" })
 
--- Session management with persistence.nvim (manual only)
-vim.keymap.set("n", "<leader>ss", function() require("persistence").save() end, { desc = "Save session" })
-vim.keymap.set("n", "<leader>sl", function() require("persistence").load({ last = true }) end, { desc = "Load last session" })
-vim.keymap.set("n", "<leader>sS", function() require("persistence").select() end, { desc = "Select session to load" })
-vim.keymap.set("n", "<leader>sx", function() require("persistence").delete() end, { desc = "Delete current session" })
-vim.keymap.set("n", "<leader>sX", function()
-    local sessions_dir = vim.fn.stdpath("state") .. "/sessions/"
-    local sessions = vim.fn.glob(sessions_dir .. "*.vim", false, true)
-    
-    if #sessions == 0 then
-        print("No sessions found")
-        return
-    end
-    
-    local session_names = {}
-    for _, session in ipairs(sessions) do
-        table.insert(session_names, vim.fn.fnamemodify(session, ":t:r"))
-    end
-    
-    vim.ui.select(session_names, {
-        prompt = "Select session to delete:",
-    }, function(choice)
-        if choice then
-            local session_path = sessions_dir .. choice .. ".vim"
-            vim.fn.delete(session_path)
-            print("Deleted session: " .. choice)
-        end
-    end)
-end, { desc = "Delete selected session" })
-vim.keymap.set("n", "<leader>sq", function() 
-    require("persistence").save()
-    vim.cmd("qa")
-end, { desc = "Save session and quit" })
 
 
--- Tab management with scoped buffers
-vim.keymap.set("n", "<leader>tn", "<cmd>tabnew<cr>", { desc = "New tab" })
-vim.keymap.set("n", "<leader>tc", "<cmd>tabclose<cr>", { desc = "Close tab" })
-vim.keymap.set("n", "<leader>to", "<cmd>tabonly<cr>", { desc = "Close other tabs" })
-vim.keymap.set("n", "gt", "<cmd>tabnext<cr>", { desc = "Next tab" })
-vim.keymap.set("n", "gT", "<cmd>tabprev<cr>", { desc = "Previous tab" })
-vim.keymap.set("n", "<leader>tcd", function()
-    vim.t.tab_cwd = vim.fn.getcwd()
-    print("Set tab directory to: " .. vim.fn.getcwd())
-end, { desc = "Set tab working directory" })
 
-vim.keymap.set("n", "<leader>tC", function()
-    vim.ui.input({ prompt = "Enter directory: ", default = vim.fn.getcwd() }, function(input)
-        if input and vim.fn.isdirectory(input) == 1 then
-            vim.cmd("cd " .. input)
-            vim.t.tab_cwd = input
-            print("Changed tab directory to: " .. input)
-        else
-            print("Invalid directory: " .. (input or ""))
-        end
-    end)
-end, { desc = "Change tab directory" })
 
-vim.keymap.set("n", "<leader>tp", function()
-    local tab_cwd = vim.t.tab_cwd
-    if tab_cwd then
-        print("Tab directory: " .. tab_cwd)
-    else
-        print("No tab directory set (using: " .. vim.fn.getcwd() .. ")")
-    end
-end, { desc = "Print tab directory" })
+-- Buffer navigation with Tab keys (NvChad Tabufline)
+vim.keymap.set("n", "<Tab>", function() require("nvchad.tabufline").next() end, { desc = "Next buffer" })
+vim.keymap.set("n", "<S-Tab>", function() require("nvchad.tabufline").prev() end, { desc = "Previous buffer" })
 
--- Tab-local directory management (manual only)
--- Note: Auto directory changing is disabled to prevent unwanted directory switches
-
--- Only store directory when explicitly set with <leader>tcd, not on every tab leave
--- vim.api.nvim_create_autocmd("TabLeave", {
---     callback = function()
---         vim.t.tab_cwd = vim.fn.getcwd()
---     end,
--- })
-
--- Buffer navigation with Tab keys
-vim.keymap.set("n", "<Tab>", "<cmd>BufferLineCycleNext<cr>", { desc = "Next buffer" })
-vim.keymap.set("n", "<S-Tab>", "<cmd>BufferLineCyclePrev<cr>", { desc = "Previous buffer" })
-
--- Buffer management
-vim.keymap.set("n", "<leader>bd", "<cmd>bdelete<cr>", { desc = "Delete buffer" })
-vim.keymap.set("n", "<D-w>", "<cmd>bdelete<cr>", { desc = "Close buffer" })
-vim.keymap.set("n", "<leader>bo", "<cmd>BufferLineCloseOthers<cr>", { desc = "Close other buffers" })
-vim.keymap.set("n", "<leader>br", "<cmd>BufferLineCloseRight<cr>", { desc = "Close buffers to the right" })
-vim.keymap.set("n", "<leader>bl", "<cmd>BufferLineCloseLeft<cr>", { desc = "Close buffers to the left" })
+-- Buffer management (NvChad Tabufline)
+vim.keymap.set("n", "<leader>bd", function() require("nvchad.tabufline").close_buffer() end, { desc = "Delete buffer" })
+vim.keymap.set("n", "<D-w>", function() require("nvchad.tabufline").close_buffer() end, { desc = "Close buffer" })
+vim.keymap.set("n", "<leader>bo", function() require("nvchad.tabufline").closeAllBufs(false) end, { desc = "Close other buffers" })
+vim.keymap.set("n", "<leader>br", "<cmd>bdelete<cr>", { desc = "Close buffers to the right" })
+vim.keymap.set("n", "<leader>bl", "<cmd>bdelete<cr>", { desc = "Close buffers to the left" })
 
 -- Window navigation - move between split windows
 vim.keymap.set("n", "<C-h>", "<C-w>h", { desc = "Move to left window" })
@@ -178,12 +113,11 @@ vim.keymap.set("n", "<C-j>", "<C-w>j", { desc = "Move to down window" })
 vim.keymap.set("n", "<C-k>", "<C-w>k", { desc = "Move to up window" })
 vim.keymap.set("n", "<C-l>", "<C-w>l", { desc = "Move to right window" })
 
--- ToggleTerm - floating terminal window
-vim.keymap.set("n", "<leader>tt", "<cmd>ToggleTerm<cr>", { desc = "Toggle terminal" }) -- Show/hide terminal
-vim.keymap.set("n", "<leader>tv", "<cmd>ToggleTerm direction=vertical<cr>", { desc = "Toggle vertical terminal" }) -- Vertical terminal
-vim.keymap.set("n", "<leader>th", "<cmd>ToggleTerm direction=horizontal<cr>", { desc = "Toggle horizontal terminal" }) -- Horizontal terminal
-vim.keymap.set("t", "<D-v>", '<C-\\><C-n>"+pi', { desc = "Paste in terminal with Cmd+V" }) -- Paste from system clipboard
-vim.keymap.set("t", "<C-h>", [[<Cmd>wincmd h<CR>]], { desc = "Terminal left window" }) -- Move to left window from terminal
-vim.keymap.set("t", "<C-j>", [[<Cmd>wincmd j<CR>]], { desc = "Terminal down window" }) -- Move to down window from terminal
-vim.keymap.set("t", "<C-k>", [[<Cmd>wincmd k<CR>]], { desc = "Terminal up window" }) -- Move to up window from terminal
-vim.keymap.set("t", "<C-l>", [[<Cmd>wincmd l<CR>]], { desc = "Terminal right window" }) -- Move to right window from terminal
+-- NvChad UI keymaps  
+vim.keymap.set("n", "<leader>ch", "<cmd>NvCheatsheet<cr>", { desc = "Open NvChad cheatsheet" })
+vim.keymap.set("n", "<leader>th", function()
+  require("nvchad.themes").open()
+end, { desc = "Open theme picker" })
+
+
+
